@@ -13,7 +13,7 @@ const BATCH_SIZE = 1000;
 
 function createClickhouseClient() {
     return createClient({
-        host: `https://shard1.${CH_HOST}:8443`,
+        url: `https://shard1.${CH_HOST}:8443`,
         username: CH_USER,
         password: CH_PASSWORD,
         database: CH_DATABASE,
