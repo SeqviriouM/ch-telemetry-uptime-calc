@@ -14,7 +14,7 @@
     "start": "node src/index"
   },
   "dependencies": {
-    "@apla/clickhouse": "^1.6.4",
+    "@clickhouse/client": "^1.11.1",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",

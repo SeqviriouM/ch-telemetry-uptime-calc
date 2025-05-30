@@ -6,7 +6,7 @@ const dotEnv = require('dotenv');
 const dotEnvPath = path.resolve(__dirname, '../.env');
 dotEnv.config({path: dotEnvPath});
 
-const cron = require('node-cron');
+// const cron = require('node-cron');
 
 const {calculateUptime} = require('./job');
 
