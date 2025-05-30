@@ -4,7 +4,7 @@ const moment = require('moment');
 const {getDataFromClickhouse, insertUptimeData} = require('./clickhouse');
 
 async function calculateUptime() {
-    const targetDate = moment().subtract(5, 'days');
+    const targetDate = moment().subtract(1, 'days');
 
     console.log(`Calculating uptime for date: ${targetDate.format('YYYY-MM-DD')}`);
 
