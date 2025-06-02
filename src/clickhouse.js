@@ -1,7 +1,7 @@
 const {createClient} = require('@clickhouse/client');
 const moment = require('moment');
 
-const {getEnv} = require('./utils');
+const {getEnv, sleep} = require('./utils');
 
 const CH_HOST = getEnv('CH_HOST');
 const CH_USER = getEnv('CH_USER');
@@ -18,10 +18,6 @@ function createClickhouseClient() {
         password: CH_PASSWORD,
         database: CH_DATABASE,
     });
-}
-
-async function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getDataFromClickhouse(targetDate, timestampColumn = 'timestamp') {

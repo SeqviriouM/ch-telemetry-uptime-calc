@@ -15,6 +15,7 @@ cron.schedule('0 1 * * *', async () => {
     console.log('Starting scheduled uptime calculation...');
     try {
         await calculateUptime();
+
         console.log('Finished scheduled uptime calculation');
     } catch (error) {
         console.error('Error during uptime calculation:', error);

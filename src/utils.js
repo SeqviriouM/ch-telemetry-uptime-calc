@@ -8,4 +8,11 @@ function getEnv(envName, defaultValue) {
     return envValue;
 }
 
-module.exports = {getEnv};
+async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+module.exports = {
+    getEnv,
+    sleep,
+};
