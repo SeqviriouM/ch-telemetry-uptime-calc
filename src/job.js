@@ -34,6 +34,9 @@ async function calculateUptime(daysAgo = 1) {
 
     const uptimeResults = [];
 
+    // Для расчета uptime по сервису
+    const serviceMinutesMap = {};
+
     for (const [serviceAction, records] of Object.entries(groupedData)) {
         const [service, action] = serviceAction.split(':');
 
@@ -47,9 +50,18 @@ async function calculateUptime(daysAgo = 1) {
         let totalMinutes = 0;
         let downMinutes = 0;
 
+        // Инициализируем структуру для хранения данных по сервису, если её ещё нет
+        if (!serviceMinutesMap[service]) {
+            serviceMinutesMap[service] = {
+                downMinutes: {}, // Минуты, в которых была недоступна хотя бы одна ручка
+                totalMinutes: new Set(), // Все минуты, в которые был хотя бы один запрос
+            };
+        }
+
         // Анализируем каждую минуту
-        for (const minuteRecords of Object.values(recordsByMinute)) {
+        for (const [minute, minuteRecords] of Object.entries(recordsByMinute)) {
             totalMinutes++;
+            serviceMinutesMap[service].totalMinutes.add(minute);
 
             // Подсчитываем общее количество запросов и количество 5xx ошибок
             const totalRequests = minuteRecords.length;
@@ -61,8 +73,11 @@ async function calculateUptime(daysAgo = 1) {
             const errorPercentage = (errorRequests / totalRequests) * 100;
 
             // Если процент ошибок больше 5%, считаем минуту недоступной
-            if (errorPercentage > 5) {
+            const isMinuteDown = errorPercentage > 5;
+            if (isMinuteDown) {
                 downMinutes++;
+                // Отмечаем минуту как недоступную для сервиса
+                serviceMinutesMap[service].downMinutes[minute] = false;
             }
         }
 
@@ -80,6 +95,27 @@ async function calculateUptime(daysAgo = 1) {
         };
 
         uptimeResults.push(uptimeData);
+    }
+
+    // Рассчитываем uptime для каждого сервиса в целом
+    for (const [service, data] of Object.entries(serviceMinutesMap)) {
+        const totalMinutes = data.totalMinutes.size;
+        const downMinutes = Object.keys(data.downMinutes).length;
+
+        // Вычисляем uptime в процентах для сервиса
+        const serviceUptimePercentage =
+            totalMinutes > 0 ? ((totalMinutes - downMinutes) / totalMinutes) * 100 : 100;
+
+        const serviceUptimeData = {
+            timestamp: targetDate.valueOf(),
+            service,
+            action: '*', // Специальное значение для обозначения всего сервиса
+            uptimePercentage: Math.round(serviceUptimePercentage * 100) / 100, // Округляем до 2 знаков
+            totalMinutes: totalMinutes,
+            downMinutes: downMinutes,
+        };
+
+        uptimeResults.push(serviceUptimeData);
     }
 
     // Записываем результаты в ClickHouse
